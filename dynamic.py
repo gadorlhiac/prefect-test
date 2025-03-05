@@ -52,7 +52,7 @@ def create_workflow(
 @flow(name=flow_name, task_runner=ThreadPoolTaskRunner(max_workers=8), log_prints=True)
 def dynamic_flow(flow_conf: FlowConf) -> None:
 
-    wf_dict: Dict[str, str] = json.loads(conf.get("workflow"))
+    wf_dict: Dict[str, str] = json.loads(flow_conf.get("workflow"))
 
     wait_for = []
     all_futures = []
@@ -72,7 +72,7 @@ if __name__ == "__main__":
         "user": "dorlhiac",
         "lute_location": "~",
         "kerb_file": None,
-        "lute_params": {"a":1},
+        "lute_params": {"a":"1"},
         "slurm_params": ["--nodes=1"],
         "workflow": json.dumps(wf_dict),
     }
