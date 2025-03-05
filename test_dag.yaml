@@ -1,0 +1,18 @@
+task_name: PeakFinderPyAlgos
+slurm_params: ''
+next:
+- task_name: CrystFELIndexer
+  slurm_params: ''
+  next:
+  - task_name: PartialatorMerger2
+    slurm_params: ''
+    next: []
+  - task_name: PartialatorMerger
+    slurm_params: ''
+    next:
+    - task_name: HKLComparer
+      slurm_params: ''
+      next: []
+    - task_name: HKLComparer2
+      slurm_params: ''
+      next: []
