@@ -13,17 +13,18 @@ flow_name: str = f"lute_dynamic"
 
 def create_workflow(
     wf_dict: Dict[str, Any],
+    flow_conf: FlowConf,
     wait_for = [],
     all_futures = [],
 ) -> None:
     slurm_params: str = wf_dict.get("slurm_params", "")
-    future = run_managed_task.submit(wf_dict["task_name"], conf, slurm_params, wait_for=wait_for)
+    future = run_managed_task.submit(wf_dict["task_name"], flow_conf, slurm_params, wait_for=wait_for)
     all_futures.append(future)
     if wf_dict["next"] == []:
         return
     else:
         for task in wf_dict["next"]:
-            create_workflow(task, [future], all_futures)
+            create_workflow(task, flow_conf, [future], all_futures)
     return
 
 @flow(name=flow_name, task_runner=ThreadPoolTaskRunner(max_workers=8), log_prints=True)
@@ -33,7 +34,7 @@ def dynamic_flow(flow_conf: FlowConf) -> None:
 
     wait_for = []
     all_futures = []
-    create_workflow(wf_dict, wait_for, all_futures)
+    create_workflow(wf_dict, flow_conf, wait_for, all_futures)
     wait(all_futures)
 
 if __name__ == "__main__":
