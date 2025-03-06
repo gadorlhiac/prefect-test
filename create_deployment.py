@@ -1,37 +1,20 @@
 import json
-import os
-import time
 import yaml
-from datetime import datetime
-from typing import Optional, Any, Dict, List, Union
-from typing_extensions import TypedDict
+from typing import Any, Dict
 
-from prefect import flow, task
+from prefect import flow
 from prefect.futures import wait
 from prefect.task_runners import ThreadPoolTaskRunner
 
-#from .tasks.tasks import *
+from flow_dataclasses import FlowConf
+from tasks.jidtasks import run_managed_task
 
-class FlowConf(TypedDict):
-    experiment: str
-    run_id: str
-    JID_UPDATE_COUNTERS: Optional[str]
-    ARP_ROOT_JOB_ID: str
-    ARP_LOCATION: str
-    Authorization: str
-    user: str
-    lute_location: str
-    kerb_file: Optional[str]
-    lute_params: Dict[str, Union[str, bool]]
-    slurm_params: List[str]
-    workflow: str #Dict[str, Any]
+flow_name: str = f"lute_dynamic"
 
-flow_name: str = f"lute_{os.path.splitext(os.path.basename(__file__))[0]}"
-
-@task
-def run_managed_task(lute_task_id: str) -> str:
-    print(f"Running: {lute_task_id}")
-    return "SUCCESS"
+#@task
+#def run_managed_task(lute_task_id: str) -> str:
+#    print(f"Running: {lute_task_id}")
+#    return "SUCCESS"
 
 def create_workflow(
     wf_dict: Dict[str, Any],
@@ -39,14 +22,14 @@ def create_workflow(
     all_futures = [],
 ) -> None:
     slurm_params: str = wf_dict.get("slurm_params", "")
-    future = run_managed_task.submit(wf_dict["task_name"], wait_for=wait_for)
+    future = run_managed_task.submit(wf_dict["task_name"], conf, slurm_params, wait_for=wait_for)
     all_futures.append(future)
     if wf_dict["next"] == []:
         return
     else:
         child_tasks = []
         for task in wf_dict["next"]:
-            create_workflow(task, [future])
+            create_workflow(task, [future], all_futures)
     return
 
 @flow(name=flow_name, task_runner=ThreadPoolTaskRunner(max_workers=8), log_prints=True)
@@ -80,7 +63,7 @@ if __name__ == "__main__":
         source="https://github.com/gadorlhiac/prefect-test.git",
         entrypoint="dynamic.py:dynamic_flow",
     ).deploy(
-        name="test-deployment",
+        name="test-deployment2",
         parameters={"flow_conf":conf},
         work_pool_name="psdm-prefect-workers",
     )
