@@ -22,7 +22,6 @@ def create_workflow(
     if wf_dict["next"] == []:
         return
     else:
-        child_tasks = []
         for task in wf_dict["next"]:
             create_workflow(task, [future], all_futures)
     return
@@ -30,7 +29,7 @@ def create_workflow(
 @flow(name=flow_name, task_runner=ThreadPoolTaskRunner(max_workers=8), log_prints=True)
 def dynamic_flow(flow_conf: FlowConf) -> None:
 
-    wf_dict: Dict[str, str] = json.loads(flow_conf.get("workflow"))
+    wf_dict: Dict[str, str] = flow_conf.get("workflow")
 
     wait_for = []
     all_futures = []
