@@ -11,6 +11,7 @@ from tasks.jidtasks import run_managed_task
 
 flow_name: str = f"lute_dynamic"
 
+
 def create_workflow(
     wf_dict: Dict[str, Any],
     flow_conf: FlowConf,
@@ -18,7 +19,12 @@ def create_workflow(
     all_futures = [],
 ) -> None:
     slurm_params: str = wf_dict.get("slurm_params", "")
-    future = run_managed_task.submit(wf_dict["task_name"], flow_conf, slurm_params, wait_for=wait_for)
+    future = run_managed_task.submit(
+        lute_task_id=wf_dict["task_name"],
+        conf=flow_conf,
+        custom_slurm_params=slurm_params,
+        wait_for=wait_for
+    )
     all_futures.append(future)
     if wf_dict["next"] == []:
         return

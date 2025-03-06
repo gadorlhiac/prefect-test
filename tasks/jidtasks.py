@@ -26,11 +26,6 @@ from prefect import task
 
 from flow_dataclasses import FlowConf, LuteParams
 
-if __debug__:
-    logging.basicConfig(level=logging.DEBUG)
-else:
-    logging.basicConfig(level=logging.INFO)
-
 logger: logging.Logger = logging.getLogger(__name__)
 
 JID_API_LOCATION: str = "https://psdm.slac.stanford.edu/arps3dfjid/jid/ws"
@@ -259,7 +254,7 @@ def rpc(
     # if not self.get_location(context) in self.locations:
     #     raise AirflowException(f"JID location {self.get_location(context)} is not configured")
     experiment: str = conf.get("experiment")
-    auth: Any = conf.get("Authorization")
+    auth: str = conf.get("Authorization")
 
     uri: str = f"{JID_API_LOCATION}/{JID_API_ENDPOINTS[endpoint]}"
     # Endpoints have the string "{experiment}" in them
@@ -336,10 +331,11 @@ def run_managed_task(
         "INFO:lute.execution.executor:Task failed with return code:",
         "INFO:lute.execution.executor:Exiting after Task failure.",
     ]
-    falure_msg: str
+    failure_msg: str
     for failure_msg in failure_messages:
         if failure_msg in out:
             logger.error("Logs indicate `Task` failed!")
             sys.exit(-1)
 
+    print(out)
     return out
