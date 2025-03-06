@@ -11,11 +11,6 @@ from tasks.jidtasks import run_managed_task
 
 flow_name: str = f"lute_dynamic"
 
-#@task
-#def run_managed_task(lute_task_id: str) -> str:
-#    print(f"Running: {lute_task_id}")
-#    return "SUCCESS"
-
 def create_workflow(
     wf_dict: Dict[str, Any],
     wait_for = [],
@@ -57,7 +52,7 @@ if __name__ == "__main__":
         "kerb_file": None,
         "lute_params": {"a":"1"},
         "slurm_params": ["--nodes=1"],
-        "workflow": json.dumps(wf_dict),
+        "workflow": wf_dict,
     }
     dynamic_flow.from_source(
         source="https://github.com/gadorlhiac/prefect-test.git",
