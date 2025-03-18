@@ -347,6 +347,12 @@ def run_managed_task(
         jobs: List[Dict[str, Any]] = [msg]
         logger.info("Checking for job completion.")
         time.sleep(10)
+        jobs = rpc(
+            endpoint="job_statuses",
+            control_doc=jobs,
+            conf=conf,
+            check_for_error=[" error: ", "Traceback"],
+        )
         while jobs[0].get("status") in ("RUNNING", "SUBMITTED"):
             jobs = rpc(
                 endpoint="job_statuses",
