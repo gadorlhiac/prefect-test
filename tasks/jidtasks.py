@@ -353,6 +353,7 @@ def run_managed_task(
             conf=conf,
             check_for_error=[" error: ", "Traceback"],
         )
+        print(jobs[0])
         while jobs[0].get("status") in ("RUNNING", "SUBMITTED"):
             jobs = rpc(
                 endpoint="job_statuses",
